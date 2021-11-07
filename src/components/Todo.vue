@@ -6,8 +6,14 @@
       <button type="submit">add</button>
     </form>
 
-    <div v-for="todo in todos" :key="todo.id" data-test="todo">
+    <div
+      v-for="todo in todos"
+      :key="todo.id"
+      :class="[todo.completed ? 'completed' : '']"
+      data-test="todo"
+    >
       {{ todo.task }}
+      <input v-model="todo.completed" type="checkbox" data-test="todo-checkbox" />
     </div>
   </div>
 </template>
@@ -38,3 +44,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.completed {
+  text-decoration: line-through;
+}
+</style>
