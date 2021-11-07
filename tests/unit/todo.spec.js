@@ -13,4 +13,13 @@ describe('todo', () => {
     const todo = wrapper.get('[data-test="todo"]')
     expect(todo.text()).toBe('write test')
   })
+
+  test('should add todo', async () => {
+    const wrapper = mount(Todo)
+
+    await wrapper.get('[data-test="newTodo"]').setValue('new todo')
+    await wrapper.get('[data-test="form"]').trigger('submit')
+
+    expect(wrapper.findAll('[data-test="todo"]')).toHaveLength(2)
+  })
 })
