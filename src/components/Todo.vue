@@ -8,9 +8,13 @@
 </template>
 
 <script>
+import { ref } from '@vue/reactivity'
+
 export default {
-  data: () => ({
-    todos: [{ id: 1, task: 'make coffee', completed: false }],
-  }),
+  setup() {
+    const todos = ref([{ id: 1, task: 'write test', completed: false }])
+
+    return { todos }
+  },
 }
 </script>
