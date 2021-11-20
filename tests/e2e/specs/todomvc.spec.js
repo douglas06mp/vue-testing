@@ -24,4 +24,35 @@ describe('todo mvc', () => {
       cy.get(selector.footer).should('not.be.visible')
     })
   })
+
+  context('Case 2: New Todo', () => {
+    it('should create items', () => {
+      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
+      cy.get(selector.todoItems).eq(0).find('label').should('contain', TODO_ITEM_ONE)
+
+      cy.get(selector.newTodo).type(`${TODO_ITEM_TWO}{enter}`)
+      cy.get(selector.todoItems).eq(1).find('label').should('contain', TODO_ITEM_TWO)
+
+      cy.get(selector.todoItems).should('have.length', 2)
+    })
+
+    it('should append new item to bottom of the list', () => {
+      const TODO_ITEM_LAST = 'todo item last'
+      for (let i = 1; i < 6; i++) cy.get(selector.newTodo).type(`Item ${i}{enter}`)
+
+      cy.get(selector.newTodo).type(`${TODO_ITEM_LAST}{enter}`)
+      cy.get(selector.lastOne).find('label').should('contain', TODO_ITEM_LAST)
+    })
+
+    it('should clear input after adding item', () => {
+      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
+      cy.get(selector.newTodo).should('have.text', '')
+    })
+
+    it('should show main and footer after adding item', () => {
+      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
+      cy.get(selector.main).should('be.visible')
+      cy.get(selector.footer).should('be.visible')
+    })
+  })
 })
