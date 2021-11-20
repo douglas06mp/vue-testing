@@ -1,14 +1,17 @@
 <template>
   <Todo />
+  <Emit />
 </template>
 
 <script>
 import Todo from './components/Todo.vue'
+import Emit from './components/Emit.vue'
 
 export default {
   name: 'App',
   components: {
     Todo,
+    Emit,
   },
 }
 </script>
