@@ -10,6 +10,16 @@ describe('todo mvc', () => {
   const TODO_ITEM_ONE = 'Item 1'
   const TODO_ITEM_TWO = 'Item 2'
 
+  Cypress.Commands.add('createTodo', (todo) => {
+    cy.get(selector.newTodo).type(`${todo}{enter}`)
+    cy.get(selector.lastOne).find('label').contains(todo)
+  })
+
+  Cypress.Commands.add('createAndEditTodo', (todo) => {
+    cy.get(selector.newTodo).type(`${todo}{enter}`)
+    cy.get(selector.todoItems).eq(0).find('label').should('contain', todo).dblclick()
+  })
+
   beforeEach(() => {
     cy.visit('https://todomvc.com/examples/vue/')
   })
@@ -27,11 +37,8 @@ describe('todo mvc', () => {
 
   context('Case 2: New Todo', () => {
     it('should create items', () => {
-      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
-      cy.get(selector.todoItems).eq(0).find('label').should('contain', TODO_ITEM_ONE)
-
-      cy.get(selector.newTodo).type(`${TODO_ITEM_TWO}{enter}`)
-      cy.get(selector.todoItems).eq(1).find('label').should('contain', TODO_ITEM_TWO)
+      cy.createTodo(TODO_ITEM_ONE)
+      cy.createTodo(TODO_ITEM_TWO)
 
       cy.get(selector.todoItems).should('have.length', 2)
     })
@@ -40,7 +47,7 @@ describe('todo mvc', () => {
       const TODO_ITEM_LAST = 'todo item last'
       for (let i = 1; i <= 3; i++) cy.get(selector.newTodo).type(`Item ${i}{enter}`)
 
-      cy.get(selector.newTodo).type(`${TODO_ITEM_LAST}{enter}`)
+      cy.createTodo(TODO_ITEM_LAST)
       cy.get(selector.lastOne).find('label').should('contain', TODO_ITEM_LAST)
     })
 
@@ -57,16 +64,8 @@ describe('todo mvc', () => {
   })
 
   context('Case 3: Edit Todo', () => {
-    beforeEach(() => {
-      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
-      cy.get(selector.todoItems)
-        .eq(0)
-        .find('label')
-        .should('contain', TODO_ITEM_ONE)
-        .dblclick()
-    })
-
     it('should save edit on blur', () => {
+      cy.createAndEditTodo(TODO_ITEM_ONE)
       cy.get(selector.todoItems).eq(0).find('.edit').type(' update').blur()
       cy.get(selector.todoItems)
         .eq(0)
@@ -75,6 +74,7 @@ describe('todo mvc', () => {
     })
 
     it('should remove item if an empty text was entered', () => {
+      cy.createAndEditTodo(TODO_ITEM_ONE)
       cy.get(selector.todoItems).eq(0).find('.edit').clear().blur()
       cy.get(selector.todoItems).should('have.length', 0)
     })
