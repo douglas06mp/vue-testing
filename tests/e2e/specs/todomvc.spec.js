@@ -38,7 +38,7 @@ describe('todo mvc', () => {
 
     it('should append new item to bottom of the list', () => {
       const TODO_ITEM_LAST = 'todo item last'
-      for (let i = 1; i < 6; i++) cy.get(selector.newTodo).type(`Item ${i}{enter}`)
+      for (let i = 1; i <= 3; i++) cy.get(selector.newTodo).type(`Item ${i}{enter}`)
 
       cy.get(selector.newTodo).type(`${TODO_ITEM_LAST}{enter}`)
       cy.get(selector.lastOne).find('label').should('contain', TODO_ITEM_LAST)
@@ -53,6 +53,30 @@ describe('todo mvc', () => {
       cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
       cy.get(selector.main).should('be.visible')
       cy.get(selector.footer).should('be.visible')
+    })
+  })
+
+  context('Case 3: Edit Todo', () => {
+    beforeEach(() => {
+      cy.get(selector.newTodo).type(`${TODO_ITEM_ONE}{enter}`)
+      cy.get(selector.todoItems)
+        .eq(0)
+        .find('label')
+        .should('contain', TODO_ITEM_ONE)
+        .dblclick()
+    })
+
+    it('should save edit on blur', () => {
+      cy.get(selector.todoItems).eq(0).find('.edit').type(' update').blur()
+      cy.get(selector.todoItems)
+        .eq(0)
+        .find('label')
+        .should('contain', `${TODO_ITEM_ONE} update`)
+    })
+
+    it('should remove item if an empty text was entered', () => {
+      cy.get(selector.todoItems).eq(0).find('.edit').clear().blur()
+      cy.get(selector.todoItems).should('have.length', 0)
     })
   })
 })
