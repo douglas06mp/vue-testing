@@ -5,6 +5,7 @@ describe('todo mvc', () => {
     todoItems: '.todo-list .todo',
     newTodo: '.new-todo',
     lastOne: '.todo-list .todo:last-child',
+    toggleAll: '.toggle-all',
   }
 
   const TODO_ITEM_ONE = 'Item 1'
@@ -13,6 +14,12 @@ describe('todo mvc', () => {
   Cypress.Commands.add('createTodo', (todo) => {
     cy.get(selector.newTodo).type(`${todo}{enter}`)
     cy.get(selector.lastOne).find('label').contains(todo)
+  })
+
+  Cypress.Commands.add('createTodos', (count = 3) => {
+    for (let i = 1; i <= count; i++) {
+      cy.createTodo(`Item ${i}`)
+    }
   })
 
   Cypress.Commands.add('createAndEditTodo', (todo) => {
@@ -77,6 +84,39 @@ describe('todo mvc', () => {
       cy.createAndEditTodo(TODO_ITEM_ONE)
       cy.get(selector.todoItems).eq(0).find('.edit').clear().blur()
       cy.get(selector.todoItems).should('have.length', 0)
+    })
+  })
+
+  context('Case 4: Change Todo State', () => {
+    it('should mark todo as completed', () => {
+      cy.createTodo(TODO_ITEM_ONE)
+      cy.get(selector.todoItems).eq(0).as('firstTodo')
+
+      cy.get('@firstTodo').should('not.have.class', 'completed').find('.toggle').check()
+      cy.get('@firstTodo').should('have.class', 'completed')
+    })
+
+    it('should clear complete state of todo', () => {
+      cy.createTodo(TODO_ITEM_ONE)
+      cy.get(selector.todoItems).eq(0).as('firstTodo')
+
+      cy.get('@firstTodo').should('not.have.class', 'completed').find('.toggle').check()
+      cy.get('@firstTodo').should('have.class', 'completed').find('.toggle').uncheck()
+      cy.get('@firstTodo').should('not.have.class', 'completed')
+    })
+
+    it('should mark all items as completed as once', () => {
+      const count = 3
+      cy.createTodos(count)
+      cy.get(selector.toggleAll).check({ force: true })
+      cy.get(selector.todoItems).filter('.completed').should('have.length', count)
+    })
+
+    it('should clear the complete state of all items at once', () => {
+      cy.createTodos()
+      cy.get(selector.toggleAll).check({ force: true })
+      cy.get(selector.toggleAll).uncheck({ force: true })
+      cy.get(selector.todoItems).filter('.completed').should('have.length', 0)
     })
   })
 })
