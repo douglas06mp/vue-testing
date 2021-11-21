@@ -6,6 +6,7 @@ describe('todo mvc', () => {
     newTodo: '.new-todo',
     lastOne: '.todo-list .todo:last-child',
     toggleAll: '.toggle-all',
+    clearCompleted: '.clear-completed',
   }
 
   const TODO_ITEM_ONE = 'Item 1'
@@ -117,6 +118,23 @@ describe('todo mvc', () => {
       cy.get(selector.toggleAll).check({ force: true })
       cy.get(selector.toggleAll).uncheck({ force: true })
       cy.get(selector.todoItems).filter('.completed').should('have.length', 0)
+    })
+  })
+
+  context('Case 5: Delete Todo', () => {
+    it('should delete todo', () => {
+      cy.createTodo(TODO_ITEM_ONE)
+      cy.get(selector.todoItems).eq(0).as('firstTodo')
+
+      cy.get('@firstTodo').find('.destroy').click({ force: true })
+      cy.get(selector.todoItems).should('have.length', 0)
+    })
+
+    it('should delete todo', () => {
+      cy.createTodos()
+      cy.get(selector.toggleAll).check({ force: true })
+      cy.get(selector.clearCompleted).click()
+      cy.get(selector.todoItems).should('have.length', 0)
     })
   })
 })
